@@ -2,55 +2,86 @@
 
 (list)
 
-(恣 p q (若 (且 (若 p q) p) q))
-(恣 p q (若 (且 (若 p q) (非 q)) (非 p)))
-(恣 p q r (若 (且 (若 p q) (若 q r)) (若 p r)))
-(恣 p q (若 (且 (或 p q) (非 p)) q))
-(恣 p q r s (若 (且 (若 p q) (且 (若 r s) (或 p r))) (或 q s)))
-(恣 p q r s (若 (且 (若 p q) (若 r s) (或 (非 q) (非 s))) (或 (非 p) (非 r))))
-(恣 p q r s (若 (且 (若 p q) (若 r s) (或 p (非 s))) (或 q (非 r))))
-(恣 p q (若 (且 p q) p))
-(恣 p q (若 p (若 q (或 p q))))
-(恣 p q (若 p (或 p q)))
-(恣 p q r (若 (且 (若 p q) (若 p r)) (若 p (且 q r))))
-(恣 p q (若 (非 (且 p q)) (或 (非 p) (非 q))))
-(恣 p q (若 (或 (非 p) (非 q)) (非 (且 p q))))
-(恣 p q (若 (非 (或 p q)) (且 (非 p) (非 q))))
-(恣 p q (若 (且 (非 p) (非 q)) (非 (或 p q))))
-(恣 p q (若 (或 p q) (或 q p)))
-(恣 p q (若 (或 q p) (或 p q)))
-(恣 p q (若 (且 p q) (且 q p)))
-(恣 p q (若 (且 q p) (且 p q)))
-(恣 p q (若 (且 (等 p q) (若 q p)) (且 (若 q p) (若 p q))))
-(恣 p q (若 (且 (若 q p) (若 p q)) (且 (若 p q) (若 q p))))
-(恣 p q (若 (等 p q) (等 q p)))
-(恣 p q (若 (等 q p) (等 p q)))
-(恣 p q r (若 (或 p (或 q r)) (或 (或 p q) r)))
-(恣 p q r (若 (或 (或 p q) r) (或 p (或 q r))))
-(恣 p q r (若 (且 p (且 q r)) (且 (且 p q) r)))
-(恣 p q r (若 (且 (且 p q) r) (且 p (且 q r))))
-(恣 p q r (若 (且 p (或 q r)) (或 (且 p q) (且 p r))))
-(恣 p q r (若 (或 (且 p q) (且 p r)) (且 p (或 q r))))
-(恣 p q r (若 (或 p (且 q r)) (且 (或 p q) (或 p r))))
-(恣 p q r (若 (且 (或 p q) (或 p r)) (或 p (且 q r))))
-(恣 p (若 p (非 (非 p))))
-(恣 p (若 (非 (非 p)) p))
-(恣 p q (若 (若 p q) (若 (非 q) (非 p))))
-(恣 p q (若 (若 (非 q) (非 p)) (若 p q)))
-(恣 p q (若 (若 p q) (或 (非 p) q)))
-(恣 p q (若 (或 (非 p) q) (若 p q)))
-(恣 p q (若 (等 p q) (且 (若 p q) (若 q p))))
-(恣 p q (若 (且 (若 p q) (若 q p)) (等 p q)))
-(恣 p q (若 (等 p q) (或 (且 p q) (且 (非 p) (非 q)))))
-(恣 p q (若 (或 (且 p q) (且 (非 p) (非 q))) (等 p q)))
-(恣 p q (若 (等 p q) (且 (或 p (非 q)) (或 (非 p) q))))
-(恣 p q (若 (且 (或 p (非 q)) (或 (非 p) q)) (等 p q)))
-(恣 p q r (若 (若 (且 p q) r) (若 p (若 q r))))
-(恣 p q r (若 (若 p (若 q r)) (若 (且 p q) r)))
-(恣 p (若 p (或 p p)))
-(恣 p (若 (或 p p) p))
-(恣 p (若 p (且 p p)))
-(恣 p (若 (且 p p) p))
-(恣 p (或 p (非 p)))
-(恣 p (非 (且 p (非 p))))
-(恣 p q (若 (且 p (非 p)) q))
+;; Modus Ponens
+(恣 [p q] ((p -> q) && p) -> q)
+;; Modus Tollens
+(恣 [p q] ((p -> q) && ! q) -> ! p)
+;; Hypothetical Syllogism
+(恣 [p q r] ((p -> q) && (q -> r)) -> (p -> r))
+;; Disjunctive Syllogism
+(恣 [p q] ((p || q) && ! p) -> q)
+;; Constructive Dilemma
+(恣 [p q r s] ((p -> q) && ((r -> s) && (p || r))) -> (q || s))
+;; Destructive Dilemma
+(恣 [p q r] ((p -> q) && ((r -> s) && (! q || ! s))) -> (! p || ! r))
+;; Bidirectional Dilemma
+(恣 [p q r s] ((p -> q) && ((r -> s) && (p || ! s))) -> (q || ! r))
+;; Simplification
+(恣 [p q] (p && q) -> p)
+;; Conjunction
+(恣 [p q] p -> (q -> (p && q)))
+;; Addition
+(恣 [p q] p -> (p || q))
+;; Composition
+(恣 [p q r] ((p -> q) && (p -> r)) -> (p -> (q && r)))
+;; De Morgan's Theorem
+(恣 [p q] (! (p && q)) -> (! p || ! q))
+(恣 [p q] (! p || ! q) -> (! (p && q)))
+;; De Morgan's Theorem
+(恣 [p q] (! (p || q)) -> (! p && ! q))
+(恣 [p q] (! p && ! q) -> (! (p || q)))
+;; Commutation
+(恣 [p q] (p || q) -> (q || p))
+(恣 [p q] (q || p) -> (p || q))
+;; Commutation
+(恣 [p q] (p && q) -> (q && p))
+(恣 [p q] (q && p) -> (p && q))
+;; Commutation
+(恣 [p q] (p <-> q) -> (q <-> p))
+(恣 [p q] (q <-> p) -> (p <-> q))
+;; Association
+(恣 [p q r] (p || (q || r)) -> ((p || q) || r))
+(恣 [p q r] ((p || q) || r) -> (p || (q || r)))
+;; Association
+(恣 [p q r] (p && (q && r)) -> ((p && q) && r))
+(恣 [p q r] ((p && q) && r) -> (p && (q && r)))
+;; Distribution
+(恣 [p q r] (p && (q || r)) -> ((p && q) || (p && r)))
+(恣 [p q r] ((p && q) || (p && r)) -> (p && (q || r)))
+;; Distribution
+(恣 [p q r] (p || (q && r)) -> ((p || q) && (p || r)))
+(恣 [p q r] ((p || q) && (p || r)) -> (p || (q && r)))
+;; Double Negation
+(恣 [p] p -> (非 (非 p)))
+(恣 [p] (非 (非 p)) -> p)
+;; Transposition
+(恣 [p q] (p -> q) -> (! q -> ! p))
+(恣 [p q] (! q -> ! p) -> (p -> q))
+;; Material Implication
+(恣 [p q] (p -> q) -> (! p || q))
+(恣 [p q] (! p || q) -> (p -> q))
+;; Material Equivalence
+(恣 [p q] (p <-> q) -> ((p -> q) && (q -> p)))
+(恣 [p q] ((p -> q) && (q -> p)) -> (p <-> q))
+;; Material Equivalence
+(恣 [p q] (p <-> q) -> ((p && q) || (! p && ! q)))
+(恣 [p q] ((p && q) || (! p && ! q)) -> (p <-> q))
+;; Material Equivalence
+(恣 [p q] (p <-> q) -> ((p || ! q) && (! p || q)))
+(恣 [p q] ((p || ! q) && (! p || q)) -> (p <-> q))
+;; Exportation
+(恣 [p q r] ((p && q) -> r) -> (p -> (q -> r)))
+;; Importation
+(恣 [p q r] (p -> (q -> r)) -> ((p && q) -> r))
+;; Idempotence of disjunction
+(恣 [p] p -> (p || p))
+(恣 [p] (p || p) -> p)
+;; Idempotence of conjunction
+(恣 [p] p -> (p && p))
+(恣 [p] (p && p) -> p)
+;; Tertium non datur (Law of Excluded Middle)
+(恣 [p] p || ! p)
+;; Law of Non-Contradiction
+(恣 [p] ! (p && ! p))
+;; Explosion
+(恣 [p q] (p && ! p) -> q)
