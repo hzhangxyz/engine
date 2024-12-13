@@ -6,7 +6,7 @@
 (define-syntax-rule (恣 变量 ... 身体)
   (cons (set '变量 ...) '身体))
 
-(define (展示 事实)
+(define (示 事实)
   (format "~a ~a" (string-join (cons "恣" (set-map (car 事实) symbol->string)) " ") (cdr 事实)))
 
 (define (演绎 新变量 替换表 事实)
@@ -87,26 +87,35 @@
     [(cons (cons 事实变量 事实身体) (cons 启发变量 (list '若 启发前提 启发结论))) (演绎 启发变量 (匹配 事实变量 事实身体 启发变量 启发前提 #f) 事实)]
     [else (raise (format "输入的事实 ~e 和启发 ~e 无法匹配，无法演绎" 事实 启发))]))
 
-(define (演化 理论)
-  (filter (lambda (x) (not (eq? null x)))
-          (append* (for/list ([a 理论])
-                     (append* (for/list ([b 理论])
-                                (list (with-handlers ([string? (lambda (_) null)])
-                                        (正绎 a b))
-                                      (with-handlers ([string? (lambda (_) null)])
-                                        (反绎 a b))
-                                      (with-handlers ([string? (lambda (_) null)])
-                                        (推理 a b)))))))))
+;; 驱动函数
 
-(define (多演 理论 迭代 截断 钩子)
-  (define (单次 理论)
-    (append 理论
-            (钩子 (filter (lambda (事实) (and (< (长度 (cdr 事实)) 截断) (not (member 事实 理论))))
-                        (remove-duplicates (演化 理论))))))
-  (foldr (lambda (f x) (f x)) 理论 (make-list 迭代 单次)))
+(define (演化 新理论 旧理论)
+  (define 旧数量 (length 旧理论))
+  (filter (lambda (可能的事实) (not (eq? null 可能的事实)))
+          (append* (for/list ([条件一 新理论]
+                              [序号一 (in-naturals)])
+                     (append* (for/list ([条件二 新理论]
+                                         [序号二 (in-naturals)])
+                                (if (and (< 序号一 旧数量) (< 序号二 旧数量))
+                                    '()
+                                    (list (with-handlers ([string? (lambda (_) null)])
+                                            (正绎 条件一 条件二))
+                                          (with-handlers ([string? (lambda (_) null)])
+                                            (反绎 条件一 条件二))
+                                          (with-handlers ([string? (lambda (_) null)])
+                                            (推理 条件一 条件二))))))))))
+
+(define (去重 新理论 原理论)
+  (filter (lambda (事实) (not (member 事实 原理论))) (remove-duplicates 新理论)))
+
+(define (多演 理论 钩子)
+  (define (单次 新理论 旧理论)
+    (append 新理论 (钩子 (去重 (演化 新理论 旧理论) 新理论))))
+  (for/fold ([理论对 (cons 理论 '())]) ([_ (in-naturals)])
+    (cons (单次 (car 理论对) (cdr 理论对)) (car 理论对))))
 
 (provide 恣
-         展示
+         示
          演绎
          推理
          长度
