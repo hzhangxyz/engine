@@ -100,16 +100,12 @@
   (filter (lambda (可能的事实) (not (eq? null 可能的事实)))
           (append* (for/list ([条件一 新理论]
                               [序号一 (in-naturals)])
-                     (append* (for/list ([条件二 新理论]
-                                         [序号二 (in-naturals)])
-                                (if (and (< 序号一 旧数量) (< 序号二 旧数量))
-                                    '()
-                                    (list (with-handlers ([string? (lambda (_) null)])
-                                            (正绎 条件一 条件二))
-                                          (with-handlers ([string? (lambda (_) null)])
-                                            (反绎 条件一 条件二))
-                                          (with-handlers ([string? (lambda (_) null)])
-                                            (推理 条件一 条件二))))))))))
+                     (for/list ([条件二 新理论]
+                                [序号二 (in-naturals)])
+                       (if (and (< 序号一 旧数量) (< 序号二 旧数量))
+                           null
+                           (with-handlers ([string? (lambda (_) null)])
+                             (推理 (正绎 条件一 条件二) (反绎 条件二 条件一)))))))))
 
 (define (去重 新理论 原理论)
   (filter (lambda (事实) (not (member 事实 原理论))) (remove-duplicates 新理论)))
