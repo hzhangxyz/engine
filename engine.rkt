@@ -1,13 +1,19 @@
 #lang racket
 
-;; 规则有两条，即演绎和推理，归纳法需要引入置信概率，暂不考虑。
-;; 规则中内置一个特殊函数`若'，用于推理。
+;; 事实是一个变量和身体组成的对
 
 (define-syntax-rule (恣 变量 ... 身体)
   (cons (set '变量 ...) '身体))
 
 (define (示 事实)
   (format "~a ~a" (string-join (cons "恣" (set-map (car 事实) symbol->string)) " ") (cdr 事实)))
+
+(define-syntax-rule (引 文件)
+  (let-values ([(目录名 文件名 _) (split-path (variable-reference->module-source (#%variable-reference)))])
+    (dynamic-require (build-path 目录名 文件) '数据)))
+
+;; 规则有两条，即演绎和推理，归纳法需要引入置信概率，暂不考虑。
+;; 规则中内置一个特殊函数`若'，用于推理。
 
 (define (演绎 新变量 替换表 事实)
   (define (替换变量 变量)
@@ -116,6 +122,7 @@
 
 (provide 恣
          示
+         引
          演绎
          推理
          长度

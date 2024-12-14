@@ -4,7 +4,7 @@
 (require ansi-color)
 (require (file "../engine.rkt"))
 
-(define 命题逻辑 (dynamic-require "../database/prop.rkt" '数据))
+(define 命题逻辑 (引 "../database/prop.rkt"))
 (define 这个世界 (append 命题逻辑 (list (恣 (非 (非 X))))))
 
 (define 目标 (恣 X))
